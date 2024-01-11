@@ -37,7 +37,7 @@ app.get("/retrieve/:sectionId", (req, res) => {
 app.post("/submit", (req, res) => {
     try {
         const { sectionId, inputIndex, value } = req.body;
-        if (!sectionId || !inputIndex || !value) {
+        if (!sectionId || !inputIndex) {
             res.status(400).json({ error: "Invalid input data" });
             return;
         }
