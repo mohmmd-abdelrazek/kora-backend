@@ -102,7 +102,7 @@ export const getLeagues = async (req: Request, res: Response) => {
   }
 };
 
-export const generateSchedule = async (req, res) => {
+export const generateSchedule = async (req: Request, res: Response) => {
   const { leagueId } = req.params;
 
   try {
