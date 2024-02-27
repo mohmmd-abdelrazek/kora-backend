@@ -18,6 +18,5 @@
     "typeRoots": ["./node_modules/@types", "./src/types"]
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/*.spec.ts"],
-  "files": ["src/types/express/global.d.ts", "node_modules/@types/express/index.d.ts"]
+  "exclude": ["node_modules", "**/*.spec.ts"]
 }
