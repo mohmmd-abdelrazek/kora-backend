@@ -1,5 +1,4 @@
 import express, { Request, Response } from "express";
-import session from "express-session";
 import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
@@ -16,6 +15,8 @@ import teamRoutes from "./routes/teamRoutes";
 // Database connection import
 // Assuming it sets up a connection and does not export anything directly used here
 import "./config/pgConfig";
+import { sessionMiddleware } from './config/redisConfig';
+
 import passport from "./config/passportConfig";
 import playerRoutes from "./routes/playerRoutes";
 
@@ -39,18 +40,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(flash());
 
 // Session configuration
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "secret",
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-      maxAge: 1000 * 60 * 60,
-      secure: process.env.NODE_ENV === "production",
-      httpOnly: true,
-    }, // Use secure cookies in production
-  })
-);
+app.use(sessionMiddleware);
+
 
 // Initialize Passport for authentication
 app.use(passport.initialize());

@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const express_session_1 = __importDefault(require("express-session"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
@@ -18,6 +17,7 @@ const teamRoutes_1 = __importDefault(require("./routes/teamRoutes"));
 // Database connection import
 // Assuming it sets up a connection and does not export anything directly used here
 require("./config/pgConfig");
+const redisConfig_1 = require("./config/redisConfig");
 const passportConfig_1 = __importDefault(require("./config/passportConfig"));
 const playerRoutes_1 = __importDefault(require("./routes/playerRoutes"));
 // Initialize environment variables
@@ -34,16 +34,7 @@ app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, connect_flash_1.default)());
 // Session configuration
-app.use((0, express_session_1.default)({
-    secret: process.env.SESSION_SECRET || "secret",
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-        maxAge: 1000 * 60 * 60,
-        secure: process.env.NODE_ENV === "production",
-        httpOnly: true,
-    }, // Use secure cookies in production
-}));
+app.use(redisConfig_1.sessionMiddleware);
 // Initialize Passport for authentication
 app.use(passportConfig_1.default.initialize());
 app.use(passportConfig_1.default.session());
