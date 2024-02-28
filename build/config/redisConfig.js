@@ -5,18 +5,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sessionMiddleware = void 0;
 const express_session_1 = __importDefault(require("express-session"));
+const redis_1 = require("redis");
 const connect_redis_1 = __importDefault(require("connect-redis"));
-const redis_1 = __importDefault(require("redis"));
-const RedisStore = (0, connect_redis_1.default)(express_session_1.default);
-// Configure Redis client
-const redisClient = redis_1.default.createClient({
+const redisClient = (0, redis_1.createClient)({
     url: process.env.REDIS_URL,
-    legacyMode: true,
 });
 redisClient.connect().catch(console.error);
-// Configure session with Redis store
+const redisSrore = new connect_redis_1.default({ client: redisClient });
 exports.sessionMiddleware = (0, express_session_1.default)({
-    store: new RedisStore({ client: redisClient }),
+    store: redisSrore,
     secret: process.env.SESSION_SECRET || "secret",
     resave: false,
     saveUninitialized: false,

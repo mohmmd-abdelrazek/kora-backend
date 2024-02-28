@@ -1,20 +1,16 @@
-import session from 'express-session';
-import connectRedis from 'connect-redis';
-import Redis from 'redis';
+import session from "express-session";
+import { createClient } from "redis";
+import RedisStore from "connect-redis";
 
-const RedisStore = connectRedis(session);
-
-// Configure Redis client
-const redisClient = Redis.createClient({
+const redisClient = createClient({
   url: process.env.REDIS_URL,
-  legacyMode: true,
 });
-
 redisClient.connect().catch(console.error);
 
-// Configure session with Redis store
+const redisSrore = new RedisStore({ client: redisClient });
+
 export const sessionMiddleware = session({
-  store: new RedisStore({ client: redisClient }),
+  store: redisSrore,
   secret: process.env.SESSION_SECRET || "secret",
   resave: false,
   saveUninitialized: false,
@@ -24,4 +20,3 @@ export const sessionMiddleware = session({
     maxAge: 1000 * 60 * 60 * 24, // 24 hours
   },
 });
-

@@ -19,7 +19,7 @@ export const signup = async (req: Request, res: Response) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(
       password,
-      parseInt(process.env.BCRYPT_SALT_ROUNDS) || 12
+      process.env.BCRYPT_SALT_ROUNDS || 12
     );
 
     // Insert new user into the database
@@ -34,10 +34,6 @@ export const signup = async (req: Request, res: Response) => {
       user: { id, name: userName, email: userEmail },
     });
   } catch (error) {
-    if (error.code === "23505") {
-      // PostgreSQL unique violation
-      return res.status(400).json({ error: "Email already in use." });
-    }
     console.error(error);
     res.status(500).json({ error: "Server error during signup." });
   }

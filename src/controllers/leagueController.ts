@@ -15,7 +15,7 @@ export const createLeague = async (req: Request, res: Response) => {
     numberOfPlaygrounds,
     teamNames,
   } = req.body;
-  const userId = req.user.id;
+  const userId = req.user?.id;
 
   try {
     // Begin transaction
