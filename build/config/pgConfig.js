@@ -1,10 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const pg_1 = require("pg");
-// Create a new pool instance, which will manage multiple client connections to the PostgreSQL server.
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+    throw new Error('DATABASE_URL is not defined');
+}
 const pool = new pg_1.Pool({
-    connectionString: process.env.DATABASE_URL, // Connection string from environment variable
-    ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false, // For Heroku or other cloud providers, if needed
+    connectionString: connectionString,
+    ssl: process.env.NODE_ENV === "production" ? {
+        rejectUnauthorized: false
+    } : false
 });
 exports.default = pool;
 //# sourceMappingURL=pgConfig.js.map

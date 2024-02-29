@@ -3,11 +3,7 @@ import bcrypt from "bcryptjs";
 import { Strategy as LocalStrategy } from "passport-local";
 // import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
-// Database connection
-// Assuming you have initialized and exported a Pool instance from 'src/db/index.ts'
 import pool from "./pgConfig";
-
-// Local Strategy
 
 passport.use(
   new LocalStrategy(
@@ -36,8 +32,6 @@ passport.use(
     }
   )
 );
-
-// // Google Strategy
 
 // passport.use(
 //   new GoogleStrategy(
@@ -76,7 +70,6 @@ passport.use(
 //   )
 // );
 
-// Serialization and Deserialization
 passport.serializeUser((user: Express.User, done) => {
   done(null, user.id);
 });
@@ -86,12 +79,12 @@ passport.deserializeUser(async (id: string, done) => {
     const res = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
     if (res.rows.length > 0) {
       const user: Express.User = res.rows[0];
-      done(null, user); // Correct usage
+      done(null, user); 
     } else {
-      done(null, false); // Correctly indicate no user found without an error
+      done(null, false);
     }
   } catch (err) {
-    done(err); // Pass only the error if an exception occurred
+    done(err); 
   }
 });
 

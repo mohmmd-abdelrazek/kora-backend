@@ -1,26 +1,16 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateSchedule = exports.getLeagues = exports.getLeague = exports.createLeague = void 0;
 const pgConfig_1 = __importDefault(require("../config/pgConfig"));
-const createLeague = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+const createLeague = async (req, res) => {
     const { leagueName, numberOfTeams, playersPerTeam, date, startTime, matchDuration, breakDuration, totalPlayTime, numberOfPlaygrounds, teamNames, } = req.body;
-    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+    const userId = req.user?.id;
     try {
         // Begin transaction
-        yield pgConfig_1.default.query("BEGIN");
+        await pgConfig_1.default.query("BEGIN");
         // Insert the league into the leagues table
         const leagueInsertQuery = "INSERT INTO leagues(name, number_of_teams, players_per_team, date, start_time, match_duration, break_duration, total_time, number_of_grounds, user_id) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *";
         const leagueValues = [
@@ -35,16 +25,16 @@ const createLeague = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             numberOfPlaygrounds,
             userId,
         ];
-        const leagueResult = yield pgConfig_1.default.query(leagueInsertQuery, leagueValues);
+        const leagueResult = await pgConfig_1.default.query(leagueInsertQuery, leagueValues);
         const league = leagueResult.rows[0];
         const leagueId = league.id;
         // Insert each team into the teams table
         const teamInsertQuery = "INSERT INTO teams(name, league_id) VALUES($1, $2)";
         for (const teamName of teamNames) {
-            yield pgConfig_1.default.query(teamInsertQuery, [teamName, leagueId]);
+            await pgConfig_1.default.query(teamInsertQuery, [teamName, leagueId]);
         }
         // Commit transaction
-        yield pgConfig_1.default.query("COMMIT");
+        await pgConfig_1.default.query("COMMIT");
         res.status(201).json({
             message: "League and teams created successfully",
             league: league,
@@ -52,16 +42,16 @@ const createLeague = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
     catch (error) {
         // Rollback in case of error
-        yield pgConfig_1.default.query("ROLLBACK");
+        await pgConfig_1.default.query("ROLLBACK");
         console.error("Failed to create league and teams:", error);
         res.status(500).json({ message: "Internal server error" });
     }
-});
+};
 exports.createLeague = createLeague;
-const getLeague = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getLeague = async (req, res) => {
     const { leagueId } = req.params;
     try {
-        const { rows } = yield pgConfig_1.default.query("SELECT * FROM leagues WHERE id = $1", [
+        const { rows } = await pgConfig_1.default.query("SELECT * FROM leagues WHERE id = $1", [
             leagueId,
         ]);
         if (rows.length > 0) {
@@ -77,13 +67,12 @@ const getLeague = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         console.error("Error fetching league:", error);
         res.status(500).json({ message: "Server error while fetching league." });
     }
-});
+};
 exports.getLeague = getLeague;
-const getLeagues = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
-    const userId = (_b = req.user) === null || _b === void 0 ? void 0 : _b.id;
+const getLeagues = async (req, res) => {
+    const userId = req.user?.id;
     try {
-        const { rows } = yield pgConfig_1.default.query("SELECT * FROM leagues WHERE user_id = $1", [userId]);
+        const { rows } = await pgConfig_1.default.query("SELECT * FROM leagues WHERE user_id = $1", [userId]);
         if (rows.length > 0) {
             res.json(rows);
         }
@@ -97,26 +86,26 @@ const getLeagues = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         console.error("Error fetching leagues:", error);
         res.status(500).json({ message: "Server error" });
     }
-});
+};
 exports.getLeagues = getLeagues;
-const generateSchedule = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const generateSchedule = async (req, res) => {
     const { leagueId } = req.params;
     try {
         const leagueQuery = "SELECT * FROM leagues WHERE id = $1";
-        const leagueRes = yield pgConfig_1.default.query(leagueQuery, [leagueId]);
+        const leagueRes = await pgConfig_1.default.query(leagueQuery, [leagueId]);
         const league = leagueRes.rows[0];
         if (!league) {
             return res.status(404).json({ message: "League not found" });
         }
-        const { total_time: totalTime, number_of_grounds: numberOfPlaygrounds, match_duration: matchDuration, break_duration: breakDuration, date, start_time: startTime, } = league;
+        const { total_time: totalTime, number_of_grounds: numberOfPlaygrounds, match_duration: matchDuration, break_duration: breakDuration, start_timestamp: startTime, } = league;
         const totalPlayTimeMs = totalTime * 60000;
         const matchTotalDurationMs = (matchDuration + breakDuration) * 60000;
-        const dateWithoutTime = date.toISOString().split('T')[0];
-        const startDateTime = new Date(`${dateWithoutTime}T${startTime}`);
-        let currentTime = startDateTime;
+        // Assuming startTimestamp is already a Date object;
+        // if not, you might need to parse it: new Date(startTimestamp)
+        let currentTime = new Date(startTime);
         const endTime = new Date(currentTime.getTime() + totalPlayTimeMs);
         const teamsQuery = "SELECT * FROM teams WHERE league_id = $1 ORDER BY team_id";
-        const teamsRes = yield pgConfig_1.default.query(teamsQuery, [leagueId]);
+        const teamsRes = await pgConfig_1.default.query(teamsQuery, [leagueId]);
         let teams = teamsRes.rows;
         if (teams.length % 2 !== 0) {
             teams.push({ team_id: "bye", name: "Bye" }); // Dummy team for bye matches
@@ -158,6 +147,6 @@ const generateSchedule = (req, res) => __awaiter(void 0, void 0, void 0, functio
         console.error("Error generating schedule:", error);
         res.status(500).json({ message: "Failed to generate schedule" });
     }
-});
+};
 exports.generateSchedule = generateSchedule;
 //# sourceMappingURL=leagueController.js.map

@@ -119,20 +119,17 @@ export const generateSchedule = async (req: Request, res: Response) => {
       number_of_grounds: numberOfPlaygrounds,
       match_duration: matchDuration,
       break_duration: breakDuration,
-      date,
-      start_time: startTime,
+      start_timestamp: startTime,
     } = league;
 
-    const startDate = new Date(date);
-    startDate.setHours(startTime.hours);
-    startDate.setMinutes(startTime.minutes);
-    startDate.setSeconds(startTime.seconds);
 
     const totalPlayTimeMs = totalTime * 60000;
     const matchTotalDurationMs = (matchDuration + breakDuration) * 60000;
-    let currentTime = startDate;
-    const endTime = new Date(currentTime.getTime() + totalPlayTimeMs);
 
+    // Assuming startTimestamp is already a Date object;
+    // if not, you might need to parse it: new Date(startTimestamp)
+    let currentTime = new Date(startTime);
+    const endTime = new Date(currentTime.getTime() + totalPlayTimeMs);
 
     const teamsQuery = "SELECT * FROM teams WHERE league_id = $1 ORDER BY team_id";
     const teamsRes = await pool.query(teamsQuery, [leagueId]);

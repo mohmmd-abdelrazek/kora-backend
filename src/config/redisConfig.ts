@@ -13,11 +13,11 @@ export const sessionMiddleware = session({
   // store: redisSrore,
   secret: process.env.SESSION_SECRET || "secret",
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
+  proxy: true,
   cookie: {
-    secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-    httpOnly: true,
-    maxAge: 1000 * 60 * 60 * 24, // 24 hours
-    sameSite: "none"
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: false,
+    maxAge: 1000 * 60 * 60,
   },
 });

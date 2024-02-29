@@ -3,8 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
+const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 // import helmet from "helmet";
 // import flash from "connect-flash";
@@ -17,10 +18,10 @@ const playerRoutes_1 = __importDefault(require("./routes/playerRoutes"));
 // Passport configuration imports
 // Database connection import
 // Assuming it sets up a connection and does not export anything directly used here
+require("./config/pgConfig");
 const passportConfig_1 = __importDefault(require("./config/passportConfig"));
 const redisConfig_1 = require("./config/redisConfig");
 // Initialize environment variables
-dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use((req, res, next) => {
     console.log(`Incoming ${req.method} request to ${req.url}`);
@@ -39,14 +40,14 @@ app.use(express_1.default.urlencoded({ extended: true }));
 // Session configuration
 app.use(redisConfig_1.sessionMiddleware);
 app.use((req, res, next) => {
-    console.log('Session:', req.session);
+    console.log("Session:", req.session);
     next();
 });
 // Initialize Passport for authentication
 app.use(passportConfig_1.default.initialize());
 app.use(passportConfig_1.default.session());
 app.use((req, res, next) => {
-    console.log('User:', req.user);
+    console.log("User:", req.user);
     next();
 });
 // Modular route setup
@@ -61,7 +62,7 @@ app.use((req, res) => {
 });
 // Error handling middleware
 app.use((err, req, res) => {
-    console.error('Error:', err);
+    console.error("Error:", err);
     res.status(500).json({ message: "Internal Server Error" });
 });
 // Start the server

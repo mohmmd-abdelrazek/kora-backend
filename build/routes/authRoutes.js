@@ -62,8 +62,15 @@ router.post("/login", (req, res, next) => {
 // Logout route
 router.get("/logout", authController.logout);
 // Google OAuth routes
-router.get("/google", passport_1.default.authenticate("google", { scope: ["profile", "email"] }));
-router.get("/google/callback", passport_1.default.authenticate("google", { failureRedirect: "/login" }), authController.googleCallback);
+// router.get(
+//   "/google",
+//   passport.authenticate("google", { scope: ["profile", "email"] })
+// );
+// router.get(
+//   "/google/callback",
+//   passport.authenticate("google", { failureRedirect: "/login" }),
+//   authController.googleCallback
+// );
 router.get("/status", authController.status);
 exports.default = router;
 //# sourceMappingURL=authRoutes.js.map

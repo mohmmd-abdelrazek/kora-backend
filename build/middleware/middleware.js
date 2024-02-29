@@ -55,8 +55,7 @@ const isAuthenticated = (req, res, next) => {
 exports.isAuthenticated = isAuthenticated;
 // Middleware to check if the user has an admin role
 const isAdmin = (req, res, next) => {
-    var _a;
-    const userRole = (_a = req.user) === null || _a === void 0 ? void 0 : _a.role;
+    const userRole = req.user?.role;
     if (req.isAuthenticated() && userRole === 'admin') {
         return next();
     }
