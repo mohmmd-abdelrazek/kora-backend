@@ -13,7 +13,7 @@ export const sessionMiddleware = session({
   store: redisSrore,
   secret: process.env.SESSION_SECRET || "secret",
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: true,
   cookie: {
     secure: process.env.NODE_ENV === "production", // Use secure cookies in production
     httpOnly: true,

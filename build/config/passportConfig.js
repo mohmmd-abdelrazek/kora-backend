@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const passport_1 = __importDefault(require("passport"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const passport_local_1 = require("passport-local");
-const passport_google_oauth20_1 = require("passport-google-oauth20");
+// import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 // Database connection
 // Assuming you have initialized and exported a Pool instance from 'src/db/index.ts'
 const pgConfig_1 = __importDefault(require("./pgConfig"));
@@ -36,33 +36,40 @@ passport_1.default.use(new passport_local_1.Strategy({
         done(err);
     }
 }));
-// Google Strategy
-passport_1.default.use(new passport_google_oauth20_1.Strategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "/auth/google/callback",
-}, async (accessToken, refreshToken, profile, done) => {
-    try {
-        if (!profile.emails || profile.emails.length === 0) {
-            return done(null, undefined, {
-                message: "No email found from Google account.",
-            }); // Modified line
-        }
-        const email = profile.emails[0].value;
-        let res = await pgConfig_1.default.query("SELECT * FROM users WHERE google_id = $1", [
-            profile.id,
-        ]);
-        if (res.rows.length === 0) {
-            // If the user doesn't exist, create a new user record
-            res = await pgConfig_1.default.query("INSERT INTO users (google_id, email, name) VALUES ($1, $2, $3) RETURNING *", [profile.id, email, profile.displayName]);
-        }
-        const user = res.rows[0];
-        done(null, user); // This is correct
-    }
-    catch (err) {
-        done(err, undefined);
-    }
-}));
+// // Google Strategy
+// passport.use(
+//   new GoogleStrategy(
+//     {
+//       clientID: process.env.GOOGLE_CLIENT_ID as string,
+//       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+//       callbackURL: "/auth/google/callback",
+//     },
+//     async (accessToken, refreshToken, profile, done) => {
+//       try {
+//         if (!profile.emails || profile.emails.length === 0) {
+//           return done(null, undefined, {
+//             message: "No email found from Google account.",
+//           }); // Modified line
+//         }
+//         const email = profile.emails[0].value;
+//         let res = await pool.query("SELECT * FROM users WHERE google_id = $1", [
+//           profile.id,
+//         ]);
+//         if (res.rows.length === 0) {
+//           // If the user doesn't exist, create a new user record
+//           res = await pool.query(
+//             "INSERT INTO users (google_id, email, name) VALUES ($1, $2, $3) RETURNING *",
+//             [profile.id, email, profile.displayName]
+//           );
+//         }
+//         const user: Express.User = res.rows[0];
+//         done(null, user); // This is correct
+//       } catch (err) {
+//         done(err as Error, undefined);
+//       }
+//     }
+//   )
+// );
 // Serialization and Deserialization
 passport_1.default.serializeUser((user, done) => {
     done(null, user.id);

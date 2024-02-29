@@ -42,6 +42,7 @@ export const signup = async (req: Request, res: Response) => {
 // User login - handled by Passport's local strategy; this is just for demonstration
 export const login = (req: Request, res: Response) => {
   // Authentication is actually handled by Passport before this function is called
+  console.log('Sign-in request received:', req.body);
   if (req.user) {
     res.status(200).json({ message: "Login successful", user: req.user });
   } else {

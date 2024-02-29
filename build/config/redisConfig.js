@@ -16,7 +16,7 @@ exports.sessionMiddleware = (0, express_session_1.default)({
     store: redisSrore,
     secret: process.env.SESSION_SECRET || "secret",
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
         secure: process.env.NODE_ENV === "production", // Use secure cookies in production
         httpOnly: true,

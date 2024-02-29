@@ -1,7 +1,5 @@
 import { Pool } from 'pg';
-import dotenv from 'dotenv';
 
-dotenv.config();
 
 // Create a new pool instance, which will manage multiple client connections to the PostgreSQL server.
 const pool = new Pool({
