@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -8,18 +17,18 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const passport_1 = __importDefault(require("passport"));
 const pgConfig_1 = __importDefault(require("../config/pgConfig")); // Assuming your database pool export
 // User signup
-const signup = async (req, res) => {
+const signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, email, password } = req.body;
     try {
         // Check for existing user
-        const existingUser = await pgConfig_1.default.query("SELECT * FROM users WHERE email = $1", [email]);
+        const existingUser = yield pgConfig_1.default.query("SELECT * FROM users WHERE email = $1", [email]);
         if (existingUser.rows.length > 0) {
             return res.status(400).json({ error: "Email already in use." });
         }
         // Hash password
-        const hashedPassword = await bcryptjs_1.default.hash(password, process.env.BCRYPT_SALT_ROUNDS || 12);
+        const hashedPassword = yield bcryptjs_1.default.hash(password, process.env.BCRYPT_SALT_ROUNDS || 12);
         // Insert new user into the database
-        const newUser = await pgConfig_1.default.query("INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email", [name, email, hashedPassword]);
+        const newUser = yield pgConfig_1.default.query("INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email", [name, email, hashedPassword]);
         const { id, name: userName, email: userEmail } = newUser.rows[0];
         res.status(201).json({
             message: "Signup successful",
@@ -30,7 +39,7 @@ const signup = async (req, res) => {
         console.error(error);
         res.status(500).json({ error: "Server error during signup." });
     }
-};
+});
 exports.signup = signup;
 // User login - handled by Passport's local strategy; this is just for demonstration
 const login = (req, res) => {

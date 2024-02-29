@@ -1,10 +1,16 @@
 import { Pool } from 'pg';
 
+const connectionString = process.env.DATABASE_URL;
 
-// Create a new pool instance, which will manage multiple client connections to the PostgreSQL server.
+if (!connectionString) {
+  throw new Error('DATABASE_URL is not defined');
+}
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL, // Connection string from environment variable
-  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false, // For Heroku or other cloud providers, if needed
+  connectionString: connectionString,
+  ssl: process.env.NODE_ENV === "production" ? {
+    rejectUnauthorized: false
+  } : false
 });
 
 export default pool;

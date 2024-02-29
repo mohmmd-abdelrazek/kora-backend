@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
-    "target": "es2018",
+    "target": "es2020",
     "module": "commonjs",
+    "isolatedModules": true,
+    "noUnusedLocals": true,
     "outDir": "./build",
-    "rootDir": "./src",
+    "rootDir": "src",
     "declaration": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -19,7 +21,7 @@
     },
     "typeRoots": ["./node_modules/@types", "./src/types"]
   },
-  "include": ["src/**/*"],
+  "include": ["./src/**/*"],
   "exclude": ["node_modules", "build", "**/*.spec.ts"],
   "files": ["src/types/express/global.d.ts"]
 }

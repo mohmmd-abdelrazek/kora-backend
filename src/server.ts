@@ -1,5 +1,6 @@
-import express, { Request, Response } from "express";
 import dotenv from "dotenv";
+dotenv.config();
+import express, { Request, Response } from "express";
 import cors from "cors";
 // import helmet from "helmet";
 // import flash from "connect-flash";
@@ -15,19 +16,17 @@ import playerRoutes from "./routes/playerRoutes";
 
 // Database connection import
 // Assuming it sets up a connection and does not export anything directly used here
+import "./config/pgConfig";
 import passport from "./config/passportConfig";
-import { sessionMiddleware } from './config/redisConfig';
-
+import { sessionMiddleware } from "./config/redisConfig";
 
 // Initialize environment variables
-dotenv.config();
 
 const app = express();
 app.use((req, res, next) => {
   console.log(`Incoming ${req.method} request to ${req.url}`);
   next();
 });
-
 
 // Basic security practices
 // app.use(helmet());
@@ -47,20 +46,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(sessionMiddleware);
 
 app.use((req, res, next) => {
-  console.log('Session:', req.session);
+  console.log("Session:", req.session);
   next();
 });
-
 
 // Initialize Passport for authentication
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use((req, res, next) => {
-  console.log('User:', req.user);
+  console.log("User:", req.user);
   next();
 });
-
 
 // Modular route setup
 app.use("/auth", authRoutes);
@@ -76,7 +73,7 @@ app.use((req: Request, res: Response) => {
 
 // Error handling middleware
 app.use((err: unknown, req: Request, res: Response) => {
-  console.error('Error:', err);
+  console.error("Error:", err);
   res.status(500).json({ message: "Internal Server Error" });
 });
 

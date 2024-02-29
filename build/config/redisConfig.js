@@ -11,12 +11,12 @@ const redisClient = (0, redis_1.createClient)({
     url: process.env.REDIS_URL,
 });
 redisClient.connect().catch(console.error);
-const redisSrore = new connect_redis_1.default({ client: redisClient });
+const redisSrore = (0, connect_redis_1.default)({ client: redisClient });
 exports.sessionMiddleware = (0, express_session_1.default)({
     store: redisSrore,
     secret: process.env.SESSION_SECRET || "secret",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
         secure: process.env.NODE_ENV === "production", // Use secure cookies in production
         httpOnly: true,

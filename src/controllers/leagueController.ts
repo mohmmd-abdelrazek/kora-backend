@@ -123,12 +123,16 @@ export const generateSchedule = async (req: Request, res: Response) => {
       start_time: startTime,
     } = league;
 
+    const startDate = new Date(date);
+    startDate.setHours(startTime.hours);
+    startDate.setMinutes(startTime.minutes);
+    startDate.setSeconds(startTime.seconds);
+
     const totalPlayTimeMs = totalTime * 60000;
     const matchTotalDurationMs = (matchDuration + breakDuration) * 60000;
-    const dateWithoutTime = date.toISOString().split('T')[0];
-    const startDateTime = new Date(`${dateWithoutTime}T${startTime}`);
-    let currentTime = startDateTime;
+    let currentTime = startDate;
     const endTime = new Date(currentTime.getTime() + totalPlayTimeMs);
+
 
     const teamsQuery = "SELECT * FROM teams WHERE league_id = $1 ORDER BY team_id";
     const teamsRes = await pool.query(teamsQuery, [leagueId]);
