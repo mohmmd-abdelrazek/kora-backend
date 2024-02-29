@@ -15,6 +15,7 @@ export const sessionMiddleware = session({
   resave: false,
   saveUninitialized: false,
   proxy: true,
+  name: "mybestcookie",
   cookie: {
     secure: process.env.NODE_ENV === "production",
     httpOnly: false,
